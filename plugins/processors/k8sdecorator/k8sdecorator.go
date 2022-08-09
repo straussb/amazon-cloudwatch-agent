@@ -53,7 +53,8 @@ OUTER:
 		}
 		structuredlogsadapter.AddKubernetesInfo(metric, kubernetesBlob)
 		structuredlogsadapter.TagMetricSource(metric)
-		structuredlogsadapter.TagMetricRule(metric)
+		// Disable custom metrics as the customer is not using them
+		//structuredlogsadapter.TagMetricRule(metric)
 		structuredlogsadapter.TagLogGroup(metric)
 		metric.AddTag(logscommon.LogStreamNameTag, k.NodeName)
 		out = append(out, metric)
@@ -71,9 +72,10 @@ func (k *K8sDecorator) start() {
 	k.shutdownC = make(chan bool)
 
 	k.stores = append(k.stores, stores.NewPodStore(k.HostIP, k.PrefFullPodName))
-	if k.TagService {
-		k.stores = append(k.stores, stores.NewServiceStore())
-	}
+	// Commenting out to always disable streaming of endpoints, as it was causing CPU impact on K8S API server
+	//if k.TagService {
+	//	k.stores = append(k.stores, stores.NewServiceStore())
+	//}
 
 	for _, store := range k.stores {
 		store.RefreshTick()

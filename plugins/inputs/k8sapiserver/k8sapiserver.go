@@ -70,18 +70,19 @@ func (k *K8sAPIServer) Gather(acc telegraf.Accumulator) error {
 				containerinsightscommon.MetricType: containerinsightscommon.TypeCluster,
 				"Timestamp":                        timestamp,
 			})
-		for service, podNum := range client.Ep.ServiceToPodNum() {
-			acc.AddFields("k8sapiserver",
-				map[string]interface{}{
-					"service_number_of_running_pods": podNum,
-				},
-				map[string]string{
-					containerinsightscommon.MetricType:   containerinsightscommon.TypeClusterService,
-					"Timestamp":                          timestamp,
-					containerinsightscommon.TypeService:  service.ServiceName,
-					containerinsightscommon.K8sNamespace: service.Namespace,
-				})
-		}
+		// Commenting out to always disable streaming of endpoints, as it was causing CPU impact on K8S API server
+		//for service, podNum := range client.Ep.ServiceToPodNum() {
+		//	acc.AddFields("k8sapiserver",
+		//		map[string]interface{}{
+		//			"service_number_of_running_pods": podNum,
+		//		},
+		//		map[string]string{
+		//			containerinsightscommon.MetricType:   containerinsightscommon.TypeClusterService,
+		//			"Timestamp":                          timestamp,
+		//			containerinsightscommon.TypeService:  service.ServiceName,
+		//			containerinsightscommon.K8sNamespace: service.Namespace,
+		//		})
+		//}
 		log.Printf("I! number of namespace to running pod num %v", client.Pod.NamespaceToRunningPodNum())
 		for namespace, podNum := range client.Pod.NamespaceToRunningPodNum() {
 			acc.AddFields("k8sapiserver",
